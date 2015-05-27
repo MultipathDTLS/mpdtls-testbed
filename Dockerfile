@@ -27,19 +27,19 @@ RUN git clone https://github.com/multipathdtls/wolfssl-mpdtls.git && cd wolfssl-
 	./autogen.sh && \
 	./configure --enable-mpdtls --enable-debug --enable-dh --enable-ecc --disable-examples --disable-oldtls && \
 	make install && cd .. && \
-	rm -rf wolfssl-mpdtls/
+	rm -rf *
 
-RUN git clone git://github.com/mininet/mininet.git && \
+RUN git clone https://github.com/mininet/mininet.git && \
 	sed -e 's/sudo //g' \
 	-e 's/\(apt-get -y install\)/\1 --no-install-recommends --no-install-suggests/g' \
 	-i mininet/util/install.sh && \
-	mininet/util/install.sh -nfv -s / && \
-	rm -rf mininet/ openflow/
+	mininet/util/install.sh -a -s / && \
+	rm -rf *
 
 RUN git clone https://github.com/multipathdtls/mpdtls-vpn.git && cd mpdtls-vpn/ && \
 	make && \
 	cp -r client server certs/ /experience/ && cd .. && \
-	rm -rf mpdtls-vpn
+	rm -rf *
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
