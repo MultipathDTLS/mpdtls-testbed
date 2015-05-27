@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
 	autoconf \
 	automake \
 	ca-certificates \
+	d-itg \
 	gcc \
 	git \
 	g++ \
@@ -34,13 +35,6 @@ RUN git clone git://github.com/mininet/mininet.git && \
 	-i mininet/util/install.sh && \
 	mininet/util/install.sh -nfv -s / && \
 	rm -rf mininet/ openflow/
-
-RUN wget http://traffic.comics.unina.it/software/ITG/codice/D-ITG-2.8.1-r1023-src.zip -O DITG.zip && \
-	unzip DITG.zip -d DITG && rm DITG.zip && cd DITG/ && \
-	mv `ls`/* . && \
-	make -C src
-
-ENV PATH /tmp/DITG/bin:$PATH
 
 RUN git clone https://github.com/multipathdtls/mpdtls-vpn.git && cd mpdtls-vpn/ && \
 	make && \
