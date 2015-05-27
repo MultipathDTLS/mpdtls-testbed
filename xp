@@ -1,0 +1,4 @@
+xpType:itg
+vpnSubnet:20.0.
+script:script.itg
+scheduler:2 100

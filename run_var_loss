@@ -1,0 +1,78 @@
+#!/bin/bash
+tput sc
+
+if [ "$1" = "clean" ]; then
+	tput el
+	echo "Cleaning..."
+	rm -rf data/*
+	exit 0
+fi
+
+mkdir -p data 2>&1 > /dev/null
+
+for scheduler in 2 3; do
+	for mode in TCP UDP; do
+		for lo in 0 1 2 3; do
+			echo "topoType:MultiIf
+leftSubnet:11.0.
+rightSubnet:11.2.
+#path_x:delay,queueSize(may be calc),bw(Mb),loss
+path_0:10,1000,1,0
+path_1:10,1000,3,$lo
+path_3:1,1000,10,0" > conf
+
+			echo "xpType:itg
+vpnSubnet:20.0.
+script:script.itg
+scheduler:$scheduler 100" > xp
+
+			for bwi in 80 160 240; do
+				echo "-a 20.0.0.1 -T $mode -t 60000 -c 781.25 -C $bwi" > script.itg
+
+				for i in {0..10}; do
+					DIR=data/$mode-$scheduler-$lo-$bwi-$i
+					if [ -d $DIR ] && [ "$1" != "force" ]; then
+						tput rc
+						tput el
+						echo "$DIR exists... Skipping!"
+					else
+						while [ ! -f lab.log ] || [ $(grep "Error" lab.log -c) -gt 0 ]; do
+							tput rc
+							tput el
+							echo "Running $mode experiment with sched°$scheduler, B@$lo % and ITG@$bwi p/s... Run $i"
+							./mpPerf.py -t conf -x xp > lab.log
+							ps -aef | grep controller | awk '{ print $2}' | sudo xargs kill
+						done
+
+						tput el
+						echo "Saving results..."
+						mkdir -p $DIR
+						mv -f {{client,server}.{pcap,log,err},{lab,command}.log,ITG{client,server}.log} $DIR  2>&1 > /dev/null
+
+						tput el
+						echo "Done!"
+					fi
+				done
+			done
+		done
+	done
+done
+
+if [ "$1" = "draw" ]; then
+	tput el
+	echo "Drawing..."
+	./graph2.py > data/real_bw2.txt
+	cp graph2.eps data
+fi
+
+if [ "$1" = "archive" ]; then
+	tput el
+	echo "Compressing..."
+	mkdir -p Archives 2>&1 > /dev/null
+	tar czf Archives/lossVSbwVSbw.tar.gz data
+fi
+
+tput el
+echo "Done!"
+tput el
+echo "Have a nice day ! :-)"

@@ -1,0 +1,15 @@
+#!/bin/bash
+service openvswitch-switch start
+
+cmd=$1
+$# # Shift arguments
+
+case "$cmd" in
+	"bandwidth") 	./run_var_bw $@
+			;;
+	"losses") 	./run_var_loss $@
+		  	;;
+	*) 		./mpPerf.py -t conf -x xp
+	   		cp script.itg conf xp *.pcap *.log /experience/data
+	   		;;
+esac

@@ -1,0 +1,3 @@
+[submodule "minitopo"]
+	path = minitopo
+	url = git@bitbucket.org:multipathtor/minitopo.git
