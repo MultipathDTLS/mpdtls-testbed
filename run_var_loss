@@ -1,9 +1,6 @@
 #!/bin/bash
-tput sc
 
 if [ "$1" = "clean" ]; then
-	tput el
-	echo "Cleaning..."
 	rm -rf data/*
 	exit 0
 fi
@@ -32,25 +29,16 @@ scheduler:$scheduler 100" > xp
 				for i in {0..10}; do
 					DIR=data/$mode-$scheduler-$lo-$bwi-$i
 					if [ -d $DIR ] && [ "$1" != "force" ]; then
-						tput rc
-						tput el
 						echo "$DIR exists... Skipping!"
 					else
 						while [ ! -f lab.log ] || [ $(grep "Error" lab.log -c) -gt 0 ]; do
-							tput rc
-							tput el
 							echo "Running $mode experiment with sched°$scheduler, B@$lo % and ITG@$bwi p/s... Run $i"
 							./mpPerf.py -t conf -x xp > lab.log
 							ps -aef | grep controller | awk '{ print $2}' | sudo xargs kill
 						done
 
-						tput el
-						echo "Saving results..."
 						mkdir -p $DIR
 						mv -f {{client,server}.{pcap,log,err},{lab,command}.log,ITG{client,server}.log} $DIR  2>&1 > /dev/null
-
-						tput el
-						echo "Done!"
 					fi
 				done
 			done
@@ -58,21 +46,7 @@ scheduler:$scheduler 100" > xp
 	done
 done
 
-if [ "$1" = "draw" ]; then
-	tput el
-	echo "Drawing..."
-	./graph2.py > data/real_bw2.txt
-	cp graph2.eps data
-fi
-
 if [ "$1" = "archive" ]; then
-	tput el
-	echo "Compressing..."
 	mkdir -p Archives 2>&1 > /dev/null
 	tar czf Archives/lossVSbwVSbw.tar.gz data
 fi
-
-tput el
-echo "Done!"
-tput el
-echo "Have a nice day ! :-)"

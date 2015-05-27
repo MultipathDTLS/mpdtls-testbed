@@ -2,7 +2,7 @@
 service openvswitch-switch start
 
 cmd=$1
-$# # Shift arguments
+t=$# # Shift arguments
 
 case "$cmd" in
 	"bandwidth") 	./run_var_bw $@
